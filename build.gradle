@@ -1,0 +1,79 @@
+plugins {
+	id "io.spring.dependency-management" version "1.0.6.RELEASE"
+	id "com.github.johnrengelman.shadow" version "4.0.2"
+	id "com.moowork.node" version "1.2.0"
+}
+
+apply plugin: "application"
+apply plugin: "groovy"
+apply plugin: 'idea'
+
+version "0.1"
+group "openlayers.test"
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+	maven { url "https://jcenter.bintray.com" }
+}
+
+dependencyManagement {
+	imports {
+		mavenBom 'io.micronaut:micronaut-bom:1.0.1'
+	}
+}
+
+dependencies {
+	compile "io.micronaut:micronaut-views"
+	runtime "com.github.jknack:handlebars:4.1.0"
+	
+	compile "org.codehaus.groovy:groovy-json"
+	
+	compile "io.micronaut:micronaut-runtime-groovy"
+	compile "io.micronaut:micronaut-validation"
+	compile "io.micronaut:micronaut-http-client"
+	compile "io.micronaut:micronaut-http-server-netty"
+	compileOnly "io.micronaut:micronaut-inject-groovy"
+	runtime "ch.qos.logback:logback-classic:1.2.3"
+	testCompile "io.micronaut:micronaut-inject-groovy"
+	testCompile( "org.spockframework:spock-core" ) {
+		exclude group: "org.codehaus.groovy", module: "groovy-all"
+	}
+}
+
+shadowJar {
+	mergeServiceFiles()
+}
+
+run.jvmArgs( '-noverify', '-XX:TieredStopAtLevel=1' )
+
+mainClassName = "openlayers.test.Application"
+tasks.withType( GroovyCompile ) {
+	groovyOptions.forkOptions.jvmArgs.add( '-Dgroovy.parameters=true' )
+}
+
+
+node {
+	version = '9.10.0'
+	yarnVersion = '1.3.2'
+	download = true
+	nodeModulesDir = project.file("src/main/client")
+}
+
+task buildClient(type: YarnTask, dependsOn: 'yarn') {
+	group = 'build'
+	description = 'Build the client bundle'
+	args = ['run', 'build']
+}
+
+
+
+run.jvmArgs('-noverify', '-XX:TieredStopAtLevel=1')
+
+//run.dependsOn 'buildClient'
+//build.dependsOn 'buildClient'
+
+
+compileJava.options.compilerArgs += '-parameters'
+compileTestJava.options.compilerArgs += '-parameters'
+

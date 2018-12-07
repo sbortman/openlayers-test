@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: openlayers.test
+---
+testFramework: spock
+sourceLanguage: groovy

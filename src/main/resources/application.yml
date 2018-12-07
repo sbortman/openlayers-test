@@ -1,0 +1,29 @@
+micronaut:
+  application:
+    name: openlayers-test
+  server:
+    cors:
+      enabled: true
+  router:
+    static-resources:
+      default:
+        enabled: true
+        mapping: /**
+        paths: classpath:public
+  codec:
+    json:
+      additionalTypes:
+        - text/javascript
+---
+openlayers:
+  baseMaps:
+    -
+      layerType: "tilewms"
+      title: "OSM Basic"
+      url: "https://omar-dev.ossim.io/omar-mapproxy/service"
+      params:
+        LAYERS: "o2-basemap-basic"
+        FORMAT: "image/jpeg"
+      options:
+        visible: true
+
